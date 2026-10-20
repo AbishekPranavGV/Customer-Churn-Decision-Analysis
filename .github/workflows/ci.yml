@@ -1,0 +1,28 @@
+name: CI Churn Analysis & Case Study Validation
+
+on:
+  push:
+    branches: [ main ]
+  workflow_dispatch:
+
+jobs:
+  validate:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - name: Install dependencies
+        run: pip install --upgrade pip nbformat
+      - name: Validate Case Study Notebooks
+        run: |
+          python -c "
+          import glob, nbformat
+          nbs = glob.glob('**/*.ipynb', recursive=True)
+          print(f'Found notebooks: {nbs}')
+          for nb_path in nbs:
+              with open(nb_path, 'r', encoding='utf-8') as f:
+                  n = nbformat.read(f, as_version=4)
+              print(f'Validated {nb_path}: {len(n.cells)} cells')
+          "
